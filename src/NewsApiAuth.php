@@ -1,23 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace jcobhams\NewsApi;
 
 /**
- *  @author Joseph Cobhams
+ * Handles authentication for NewsAPI requests
+ * 
+ * @author Joseph Cobhams
  */
-
 class NewsApiAuth
 {
-	private $api_key;
-	public function __construct($api_key)
-	{
-		$this->api_key = $api_key;
-	}
+    /**
+     * Create a new NewsApiAuth instance
+     * 
+     * @param string $apiKey The API key for NewsAPI authentication
+     */
+    public function __construct(
+        private readonly string $apiKey
+    ) {
+    }
 
-	public function AuthHeaders()
-	{
-		return array(
-			'Accept' => 'application/json',
-			'Authorization' => "Bearer {$this->api_key}");
-	}
+    /**
+     * Get authentication headers for API requests
+     * 
+     * @return array<string, string> Array of authentication headers
+     */
+    public function getAuthHeaders(): array
+    {
+        return [
+            'Accept' => 'application/json',
+            'Authorization' => "Bearer {$this->apiKey}",
+        ];
+    }
 }
