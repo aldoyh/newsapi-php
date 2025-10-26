@@ -1,113 +1,252 @@
-## NewsAPI-PHP
-A PHP client for the [News API](https://newsapi.org/docs/get-started).
+# NewsAPI-PHP
 
-### Installation
-Available for installation on packagist using composer.
-```
+A modern PHP 8.1+ client for the [News API](https://newsapi.org/docs/get-started) with full Arabic language support.
+
+## Features
+
+- ✨ **Modern PHP 8.1+**: Uses latest PHP features including enums, readonly properties, constructor property promotion, and strict types
+- 🌍 **Full Arabic Support**: Complete support for Arabic language (العربية) and Arabic-speaking countries
+- 🔒 **Type-Safe**: Comprehensive type hints and strict type checking
+- 📦 **PSR-4 Autoloading**: Fully compliant with modern PHP standards
+- 🧪 **Well Tested**: Comprehensive test suite with PHPUnit 9
+
+## Requirements
+
+- PHP 8.1 or higher
+- Guzzle HTTP client 7.8+
+
+## Installation
+
+Available for installation on packagist using composer:
+
+```bash
 composer require jcobhams/newsapi
 ```
 
-### Usage
-After installation and and `require`ing `vendor/autoload.php` file in your project,
+## Usage
 
-Get Your API key from [here](https://newsapi.org/register)
+### Basic Setup
+
+After installation and requiring `vendor/autoload.php` in your project:
+
+Get your API key from [here](https://newsapi.org/register)
+
 ```php
+<?php
+
 use jcobhams\NewsApi\NewsApi;
-.
-.
-.
-$newsapi = new NewsApi($your_api_key);
+
+$newsapi = new NewsApi('your-api-key-here');
 ```
 
-### Get TopHeadLines
+### Get Top Headlines
+
+```php
+// Get top headlines for a country
+$headlines = $newsapi->getTopHeadLines(country: 'us');
+
+// Get top headlines in Arabic from Saudi Arabia
+$arabicHeadlines = $newsapi->getTopHeadLines(country: 'sa');
+
+// Get top headlines for a specific category
+$techNews = $newsapi->getTopHeadLines(country: 'us', category: 'technology');
+
+// Search top headlines with Arabic keywords
+$results = $newsapi->getTopHeadLines(q: 'الرياضة', country: 'eg');
+
+// Get headlines from specific sources
+$bbcNews = $newsapi->getTopHeadLines(sources: 'bbc-news,cnn');
 ```
-$newsapi->getTopHeadlines($q, $sources, $country, $category, $page_size, $page);
 
-* $q : Keywords or a phrase to search for.
+#### Parameters
 
-* $sources: A comma-seperated string of identifiers for the news sources or blogs you want headlines from. 
-            Use the getSources() method to locate these programmatically or look at the sources index. 
-            Note: you can't mix this param with the country or category params.
-            
-* $country: The 2-letter ISO 3166-1 code of the country you want to get headlines for. 
-            Use the getCountries() method to locate these programmatically. 
-            Note: you can't mix this param with the sources param.
-            
-* $category: The category you want to get headlines for. Use the getCategories() method to locate these programmatically. 
-             Note: you can't mix this param with the sources param.
-
-* $page_size: The number of results to return per page (request). 20 is the default, 100 is the maximum.
-
-* $page: Use this to page through the results if the total results found is greater than the page size.
-
-Returns JSON object is successful or throws excpetions if invalid data or unsuccessful request.
-```
+- `q` (string|null): Keywords or phrase to search for (supports Arabic: مثال للبحث)
+- `sources` (string|null): Comma-separated source identifiers (cannot be mixed with country or category)
+- `country` (string|null): 2-letter ISO 3166-1 country code (e.g., 'us', 'sa', 'eg', 'ae')
+- `category` (string|null): Category (business, entertainment, general, health, science, sports, technology)
+- `pageSize` (int|null): Number of results per page (1-100, default 20)
+- `page` (int|null): Page number for pagination
 
 ### Get Everything
-```
-$newsapi->getEverything($q, $sources, $domains, $exclude_domains, $from, $to, $language, $sort_by,  $page_size, $page);
 
-* $domains: A comma-seperated string of domains (eg bbc.co.uk, techcrunch.com, engadget.com) to restrict the search to.
+Search through millions of articles with advanced filtering:
 
-* $exclude_domains: A comma-seperated string of domains (eg bbc.co.uk, techcrunch.com, engadget.com) to remove from the results.
+```php
+// Search for articles in English
+$results = $newsapi->getEverything(q: 'artificial intelligence', language: 'en');
 
-* $from: A date and optional time for the oldest article allowed. 
-         This should be in ISO 8601 format (e.g. 2018-11-16 or 2018-11-16T16:19:03) 
-         Default: the oldest according to your plan.
+// Search for Arabic articles
+$arabicResults = $newsapi->getEverything(q: 'التكنولوجيا', language: 'ar');
 
-* $to: A date and optional time for the newest article allowed. 
-       This should be in ISO 8601 format (e.g. 2018-11-16 or 2018-11-16T16:19:03) 
-       Default: the newest according to your plan.
+// Search with date range
+$recentNews = $newsapi->getEverything(
+    q: 'climate change',
+    from: '2024-01-01',
+    to: '2024-12-31',
+    language: 'en',
+    sortBy: 'publishedAt'
+);
 
-* $language: The 2-letter ISO-639-1 code of the language you want to get headlines for. 
-             Possible options: ar de en es fr he it nl no pt ru se ud zh . 
-             Default: all languages returned. Use the getLanguages() method to locate these programmatically.
-
-* $sort_by: The order to sort the articles in. Use the getSortBy() method to locate these programmatically.
-
-Returns JSON object is successful or throws excpetions if invalid data or unsuccessful request.
-```
-
-### Get New Sources
-```
-$newsapi->getSources($category, $language, $country)
-
-
-Returns JSON object is successful or throws excpetions if invalid data or unsuccessful request.
+// Search specific domains
+$techBlogs = $newsapi->getEverything(
+    q: 'programming',
+    domains: 'techcrunch.com,arstechnica.com',
+    language: 'en'
+);
 ```
 
-### Get Countries
+#### Parameters
+
+- `q` (string|null): Keywords or phrase to search for (supports Arabic)
+- `sources` (string|null): Comma-separated source identifiers
+- `domains` (string|null): Comma-separated domains (e.g., 'bbc.co.uk,techcrunch.com')
+- `excludeDomains` (string|null): Comma-separated domains to exclude
+- `from` (string|null): Oldest article date (ISO 8601 format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
+- `to` (string|null): Newest article date (ISO 8601 format: YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS)
+- `language` (string): Language code (default: 'en', use 'ar' for Arabic)
+- `sortBy` (string|null): Sort order (relevancy, popularity, publishedAt)
+- `pageSize` (int|null): Number of results per page (1-100, default 20)
+- `page` (int|null): Page number for pagination
+
+### Get Sources
+
+Get available news sources with optional filtering:
+
+```php
+// Get all sources
+$sources = $newsapi->getSources();
+
+// Get Arabic language sources
+$arabicSources = $newsapi->getSources(language: 'ar');
+
+// Get sources from Saudi Arabia
+$saSources = $newsapi->getSources(country: 'sa');
+
+// Get technology sources
+$techSources = $newsapi->getSources(category: 'technology');
+
+// Combined filters
+$arabicTechSources = $newsapi->getSources(category: 'technology', language: 'ar');
 ```
-$newsapi->getCountries()
 
-Returns an array of allowed countries
+### Helper Methods
+
+```php
+// Get list of supported countries (includes Arabic countries: sa, eg, ae, ma)
+$countries = $newsapi->getCountries();
+
+// Get list of supported languages (includes ar for Arabic)
+$languages = $newsapi->getLanguages();
+
+// Get list of supported categories
+$categories = $newsapi->getCategories();
+
+// Get list of supported sort options
+$sortOptions = $newsapi->getSortBy();
 ```
 
-### Get Languages
+## Arabic Language Support (دعم اللغة العربية)
+
+This library provides comprehensive support for Arabic language content:
+
+### Supported Arabic-Speaking Countries
+
+- 🇸🇦 Saudi Arabia (`sa`)
+- 🇪🇬 Egypt (`eg`)
+- 🇦🇪 United Arab Emirates (`ae`)
+- 🇲🇦 Morocco (`ma`)
+
+### Using Arabic Language
+
+```php
+use jcobhams\NewsApi\NewsApi;
+
+$newsapi = new NewsApi('your-api-key');
+
+// Get top headlines from Saudi Arabia
+$headlines = $newsapi->getTopHeadLines(country: 'sa');
+
+// Search for Arabic content
+$results = $newsapi->getEverything(
+    q: 'السعودية',
+    language: 'ar',
+    sortBy: 'publishedAt'
+);
+
+// Get Arabic news sources
+$sources = $newsapi->getSources(language: 'ar');
 ```
-$newsapi->getLanguages()
 
-Returns an array of allowed languages
+### Supported Languages
+
+The library supports all NewsAPI languages with special focus on:
+- `ar` - Arabic (العربية) ✓
+- `en` - English
+- `de` - German (Deutsch)
+- `es` - Spanish (Español)
+- `fr` - French (Français)
+- `he` - Hebrew (עברית)
+- And more...
+
+## Modern PHP Features Used
+
+This library leverages the latest PHP 8.1+ features for better code quality and developer experience:
+
+- **Enums**: Type-safe country, language, category, and sort options
+- **Readonly Properties**: Immutable configuration for better security
+- **Constructor Property Promotion**: Cleaner, more concise code
+- **Strict Types**: Enhanced type safety throughout the codebase
+- **Named Arguments**: Flexible and readable method calls
+- **Return Type Declarations**: Clear API contracts
+- **Match Expressions**: Simplified conditional logic
+
+## Error Handling
+
+The library throws `NewsApiException` for various error conditions:
+
+```php
+use jcobhams\NewsApi\NewsApi;
+use jcobhams\NewsApi\NewsApiException;
+
+try {
+    $newsapi = new NewsApi('your-api-key');
+    $results = $newsapi->getTopHeadLines(country: 'us');
+} catch (NewsApiException $e) {
+    echo "Error: " . $e->getMessage();
+    // Or get detailed error information
+    echo $e->errorMessage();
+}
 ```
 
-### Get Categories
-```
-$newsapi->getCategories()
+## Testing
 
-Returns an array of allowed categories
-```
+Run the test suite:
 
-### Get SortBy
-```
-$newsapi->getSortBy()
-
-Returns an array of allowed sort_by
+```bash
+./vendor/bin/phpunit
 ```
 
-### CONTRIBUTORS
+Run tests with detailed output:
 
-This package is authored by Joseph Cobhams.
+```bash
+./vendor/bin/phpunit --testdox
+```
 
-### TODO
-Write more unit tests, mocks and stubs.
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Author
+
+**Joseph Cobhams**
+- Email: jcobhams@gmail.com
+
+## Acknowledgments
+
+- [NewsAPI](https://newsapi.org/) for providing the excellent news API service
+- The PHP community for continuous improvements to the language
 

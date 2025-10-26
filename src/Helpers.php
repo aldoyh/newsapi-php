@@ -1,67 +1,117 @@
 <?php
 
+declare(strict_types=1);
+
 namespace jcobhams\NewsApi;
 
 /**
- *  @author Joseph Cobhams
+ * Helper class for NewsAPI operations
+ * 
+ * Provides URL generation and validation utilities
+ * 
+ * @author Joseph Cobhams
  */
-
 final class Helpers
 {
-	private static $countries = array(
-		'ae', 'ar', 'at', 'au', 'be', 'bg', 'br', 'ca', 'ch', 'cn', 'co', 'cu', 'cz', 'de', 'eg', 'fr', 'gb', 'gr',
-		'hk', 'hu','id','ie','il','in','it','jp','kr','lt','lv','ma','mx','my','ng','nl','no','nz','ph','pl', 'pt',
-		'ro','rs','ru','sa','se','sg','si','sk','th','tr','tw','ua','us','ve','za');
+    private const BASE_URL = 'https://newsapi.org/v2';
 
-	private static $languages = array('ar','en','cn','de','es','fr','he','it','nl','no','pt','ru','sv','ud');
-	private static $categories = array('business', 'entertainment', 'general', 'health', 'science', 'sports', 'technology');
-	private static $sort = array('relevancy', 'popularity', 'publishedAt');
+    /**
+     * Get the top headlines endpoint URL
+     * 
+     * @param string|null $params Optional query parameters
+     * @return string Full URL for top headlines endpoint
+     */
+    final public static function topHeadlinesUrl(?string $params = null): string
+    {
+        return $params 
+            ? self::BASE_URL . "/top-headlines?{$params}"
+            : self::BASE_URL . '/top-headlines';
+    }
 
-	final static public function topHeadlinesUrl($params=null){
-		if(!is_null($params)){
-			return "https://newsapi.org/v2/top-headlines?{$params}";
-		}
-		return 'https://newsapi.org/v2/top-headlines';
-	}
+    /**
+     * Get the everything endpoint URL
+     * 
+     * @param string|null $params Optional query parameters
+     * @return string Full URL for everything endpoint
+     */
+    final public static function everythingUrl(?string $params = null): string
+    {
+        return $params 
+            ? self::BASE_URL . "/everything?{$params}"
+            : self::BASE_URL . '/everything';
+    }
 
-	final static public function everythingUrl($params=null){
-		if(!is_null($params)){
-			return "https://newsapi.org/v2/everything?{$params}";
-		}
-		return 'https://newsapi.org/v2/everything';
-	}
+    /**
+     * Get the sources endpoint URL
+     * 
+     * @param string|null $params Optional query parameters
+     * @return string Full URL for sources endpoint
+     */
+    final public static function sourcesUrl(?string $params = null): string
+    {
+        return $params 
+            ? self::BASE_URL . "/sources?{$params}"
+            : self::BASE_URL . '/sources';
+    }
 
-	final static public function sourcesUrl($params=null){
-		if(!is_null($params)){
-			return "https://newsapi.org/v2/sources?{$params}";
-		}
-		return 'https://newsapi.org/v2/sources';
-	}
+    /**
+     * Check if a country code is valid
+     * 
+     * @param string $country Country code to validate
+     * @return bool True if valid, false otherwise
+     */
+    final public static function isCountryValid(string $country): bool
+    {
+        return Country::isValid($country);
+    }
 
-	final static public function isCountryValid($country){
-		if(in_array($country, Helpers::$countries)){ return true; }
-		return false;
-	}
+    /**
+     * Check if a language code is valid
+     * 
+     * @param string $language Language code to validate
+     * @return bool True if valid, false otherwise
+     */
+    final public static function isLanguageValid(string $language): bool
+    {
+        return Language::isValid($language);
+    }
 
-	final static public function isLanguageValid($language){
-		if(in_array($language, Helpers::$languages)){ return true; }
-		return false;
-	}
+    /**
+     * Check if a category is valid
+     * 
+     * @param string $category Category to validate
+     * @return bool True if valid, false otherwise
+     */
+    final public static function isCategoryValid(string $category): bool
+    {
+        return Category::isValid($category);
+    }
 
-	final static public function isCategoryValid($category){
-		if(in_array($category, Helpers::$categories)){ return true; }
-		return false;
-	}
+    /**
+     * Check if a sort option is valid
+     * 
+     * @param string $sortBy Sort option to validate
+     * @return bool True if valid, false otherwise
+     */
+    final public static function isSortByValid(string $sortBy): bool
+    {
+        return SortBy::isValid($sortBy);
+    }
 
-	final static public function isSortByValid($sort_by){
-		if(in_array($sort_by, Helpers::$sort)){ return true; }
-		return false;
-	}
-
-	final static public function __get__($key){
-		if($key == 'countries'){ return Helpers::$countries;}
-		if($key == 'languages'){ return Helpers::$languages;}
-		if($key == 'categories'){ return Helpers::$categories;}
-		if($key == 'sort'){ return Helpers::$sort;}
-	}
+    /**
+     * Get values for a specific type
+     * 
+     * @param string $key Type key (countries, languages, categories, sort)
+     * @return array<string> Array of values
+     */
+    final public static function __get__(string $key): array
+    {
+        return match($key) {
+            'countries' => Country::values(),
+            'languages' => Language::values(),
+            'categories' => Category::values(),
+            'sort' => SortBy::values(),
+            default => [],
+        };
+    }
 }
